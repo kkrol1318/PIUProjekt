@@ -112,6 +112,39 @@
           </div>
 
           <div class="card">
+            <h2 class="card__title">Semestr</h2>
+
+            <p class="muted" style="margin-top: 0">
+              Do sesji: <strong id="sessionCountdown">—</strong>
+            </p>
+
+            <div class="progress" aria-label="Progres semestru">
+              <div
+                class="progress__bar"
+                id="semesterProgressBar"
+                style="width: 0%"
+              ></div>
+            </div>
+            <p class="muted" id="semesterProgressText">0%</p>
+
+            <div class="mini-grid" style="margin-top: 12px">
+              <div>
+                <label class="label" for="semesterStart">Start</label>
+                <input id="semesterStart" class="input" type="date" />
+              </div>
+              <div>
+                <label class="label" for="semesterEnd">Koniec</label>
+                <input id="semesterEnd" class="input" type="date" />
+              </div>
+              <div>
+                <label class="label" for="sessionDate">Sesja</label>
+                <input id="sessionDate" class="input" type="date" />
+              </div>
+            </div>
+            <p class="hint">Daty zapisują się automatycznie.</p>
+          </div>
+
+          <div class="card">
             <h2 class="card__title">Motywacja</h2>
             <quote-box></quote-box>
           </div>

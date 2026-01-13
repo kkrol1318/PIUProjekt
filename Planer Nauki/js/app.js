@@ -6,6 +6,7 @@ import {
     addTask,
     toggleTaskDone,
     deleteTask,
+    setSemesterConfig,
 } from './store.js';
 import { priorityWeight } from './utils.js';
 import './components/task-card.js';
@@ -41,8 +42,34 @@ const emptyState = document.getElementById('emptyState');
 const progressBar = document.getElementById('progressBar');
 const progressText = document.getElementById('progressText');
 
+// SEMESTER / SESSION
+const semesterStartInput = document.getElementById('semesterStart');
+const semesterEndInput = document.getElementById('semesterEnd');
+const sessionDateInput = document.getElementById('sessionDate');
+const sessionCountdown = document.getElementById('sessionCountdown');
+const semesterProgressBar = document.getElementById('semesterProgressBar');
+const semesterProgressText = document.getElementById('semesterProgressText');
+
 // THEME
 applyTheme(state.theme);
+
+// SEMESTER INPUTS init
+if (semesterStartInput) semesterStartInput.value = state.semesterStart;
+if (semesterEndInput) semesterEndInput.value = state.semesterEnd;
+if (sessionDateInput) sessionDateInput.value = state.sessionDate;
+
+function onSemesterInputChange() {
+    setSemesterConfig(state, {
+        semesterStart: semesterStartInput?.value,
+        semesterEnd: semesterEndInput?.value,
+        sessionDate: sessionDateInput?.value,
+    });
+    renderSemester();
+}
+
+semesterStartInput?.addEventListener('change', onSemesterInputChange);
+semesterEndInput?.addEventListener('change', onSemesterInputChange);
+sessionDateInput?.addEventListener('change', onSemesterInputChange);
 
 themeToggle.addEventListener('click', () => {
     const next =
@@ -103,7 +130,7 @@ taskForm.addEventListener('submit', (e) => {
     render({ animateNewTaskId: task.id });
 });
 
-// Zdarzenia z Web Componentów (CustomEvent)
+// Zdarzenia  Componentów
 tasksList.addEventListener('toggleDone', (e) => {
     toggleTaskDone(state, e.detail.id);
     render();
@@ -126,6 +153,7 @@ function render({ animateNewTaskId = null } = {}) {
     renderHeader();
     renderTasks(animateNewTaskId);
     renderProgress();
+    renderSemester();
 }
 
 function renderSubjects() {
@@ -262,4 +290,51 @@ function renderProgress() {
 
     progressBar.style.width = `${pct}%`;
     progressText.textContent = `${pct}% (${done}/${total})`;
+}
+
+function clampPct(n) {
+    return Math.max(0, Math.min(100, n));
+}
+
+function daysBetweenISO(fromISO, toISO) {
+    const from = new Date(fromISO + 'T00:00:00');
+    const to = new Date(toISO + 'T00:00:00');
+    const diff = to.getTime() - from.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function renderSemester() {
+    // countdown do sesji
+    const today = new Date();
+    const todayISO = today.toISOString().slice(0, 10);
+
+    if (!state.sessionDate) {
+        sessionCountdown.textContent = '—';
+    } else {
+        const d = daysBetweenISO(todayISO, state.sessionDate);
+        if (d > 1) sessionCountdown.textContent = `${d} dni`;
+        else if (d === 1) sessionCountdown.textContent = '1 dzień';
+        else if (d === 0) sessionCountdown.textContent = 'dzisiaj';
+        else sessionCountdown.textContent = `${Math.abs(d)} dni po sesji`;
+    }
+
+    // progres semestru
+    const start = state.semesterStart;
+    const end = state.semesterEnd;
+
+    if (!start || !end || end < start) {
+        semesterProgressBar.style.width = '0%';
+        semesterProgressText.textContent = '0%';
+        return;
+    }
+
+    const totalDays = Math.max(1, daysBetweenISO(start, end));
+    const elapsedDays = totalDays - Math.max(0, daysBetweenISO(todayISO, end));
+    const pct = clampPct(Math.round((elapsedDays / totalDays) * 100));
+
+    semesterProgressBar.style.width = `${pct}%`;
+    semesterProgressText.textContent = `${pct}% (${Math.min(
+        Math.max(elapsedDays, 0),
+        totalDays
+    )}/${totalDays} dni)`;
 }

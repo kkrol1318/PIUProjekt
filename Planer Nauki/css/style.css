@@ -269,7 +269,7 @@ body {
 }
 
 /* RESPONSYWNOŚĆ */
-@media (max-width: 980px) {
+@media (max-width: 1024px) {
   .layout {
     grid-template-columns: 1fr;
   }
@@ -281,6 +281,19 @@ body {
     grid-template-columns: 1fr;
   }
   .row--3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*  UI dla ustawień semestru */
+.mini-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 1024px) {
+  .mini-grid {
     grid-template-columns: 1fr;
   }
 }

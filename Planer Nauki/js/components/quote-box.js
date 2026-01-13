@@ -12,10 +12,10 @@ class QuoteBox extends HTMLElement {
         this.load();
     }
 
-    async load() {
+    async load({ force = false } = {}) {
         this.setState({ loading: true, error: null });
         try {
-            const q = await fetchQuote();
+            const q = await fetchQuote({ force });
             this.setState({
                 loading: false,
                 content: q.content,
@@ -71,7 +71,7 @@ class QuoteBox extends HTMLElement {
 
         this.shadowRoot
             .getElementById('refresh')
-            ?.addEventListener('click', () => this.load());
+            ?.addEventListener('click', () => this.load({ force: true }));
     }
 }
 
