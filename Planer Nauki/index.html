@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Smart Study Planner</title>
+    <link rel="stylesheet" href="./css/themes.css" />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand__logo">📚</span>
+        <span class="brand__name">Smart Study Planner</span>
+      </div>
+
+      <div class="header-actions">
+        <button
+          id="themeToggle"
+          class="btn btn--ghost"
+          type="button"
+          aria-pressed="false"
+        >
+          🌞 / 🌙
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <h2 class="section-title">Przedmioty</h2>
+
+        <form id="subjectForm" class="form">
+          <label class="label" for="subjectName">Dodaj przedmiot</label>
+          <div class="row">
+            <input
+              id="subjectName"
+              class="input"
+              type="text"
+              name="subjectName"
+              placeholder="np. Matematyka dyskretna"
+              required
+              minlength="2"
+              maxlength="40"
+            />
+            <button class="btn" type="submit">Dodaj</button>
+          </div>
+          <p class="hint">Kliknij przedmiot, aby go wybrać.</p>
+        </form>
+
+        <ul id="subjectsList" class="subjects"></ul>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main">
+        <section class="topbar">
+          <div class="topbar__left">
+            <h1 id="currentSubjectTitle" class="page-title">
+              Wybierz przedmiot
+            </h1>
+            <p id="currentSubjectMeta" class="muted">
+              Dodaj przedmiot po lewej.
+            </p>
+          </div>
+
+          <div class="topbar__right">
+            <select
+              id="filterSelect"
+              class="select"
+              aria-label="Filtruj zadania"
+            >
+              <option value="all">Wszystkie</option>
+              <option value="today">Dziś</option>
+              <option value="week">Do 7 dni</option>
+              <option value="overdue">Zaległe</option>
+              <option value="done">Zrobione</option>
+            </select>
+
+            <select id="sortSelect" class="select" aria-label="Sortuj zadania">
+              <option value="dueDateAsc">Termin ↑</option>
+              <option value="dueDateDesc">Termin ↓</option>
+              <option value="priorityDesc">Priorytet ↓</option>
+              <option value="createdDesc">Najnowsze</option>
+            </select>
+
+            <button id="openTaskModal" class="btn" type="button" disabled>
+              + Zadanie
+            </button>
+          </div>
+        </section>
+
+        <section class="grid">
+          <div class="card">
+            <h2 class="card__title">Zadania</h2>
+
+            <ul id="tasksList" class="tasks"></ul>
+            <p id="emptyState" class="muted">Brak zadań. Dodaj pierwsze 🙂</p>
+          </div>
+
+          <div class="card">
+            <h2 class="card__title">Postęp</h2>
+            <div class="progress">
+              <div
+                class="progress__bar"
+                id="progressBar"
+                style="width: 0%"
+              ></div>
+            </div>
+            <p class="muted" id="progressText">0% (0/0)</p>
+          </div>
+
+          <div class="card">
+            <h2 class="card__title">Motywacja</h2>
+            <quote-box></quote-box>
+          </div>
+
+          <div class="card">
+            <h2 class="card__title">Szybkie wskazówki</h2>
+            <ul class="tips">
+              <li>Dodaj terminy — filtr „Zaległe” pokaże co goni.</li>
+              <li>Używaj priorytetu „High” na kolokwia/projekty.</li>
+              <li>Włącz ciemny motyw wieczorem 👀</li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- MODAL: dodawanie zadania -->
+    <dialog id="taskModal" class="modal">
+      <form id="taskForm" class="modal__content" method="dialog">
+        <div class="modal__header">
+          <h2>Dodaj zadanie</h2>
+          <button class="btn btn--ghost" type="button" id="closeTaskModal">
+            ✕
+          </button>
+        </div>
+
+        <label class="label" for="taskTitle">Tytuł</label>
+        <input
+          id="taskTitle"
+          class="input"
+          type="text"
+          required
+          minlength="2"
+          maxlength="80"
+        />
+
+        <div class="row row--3">
+          <div>
+            <label class="label" for="taskDueDate">Termin</label>
+            <input id="taskDueDate" class="input" type="date" />
+          </div>
+
+          <div>
+            <label class="label" for="taskPriority">Priorytet</label>
+            <select id="taskPriority" class="select">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="label" for="taskType">Typ</label>
+            <select id="taskType" class="select">
+              <option value="homework">Zadanie</option>
+              <option value="quiz">Kolokwium</option>
+              <option value="project">Projekt</option>
+              <option value="reading">Czytanie</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal__actions">
+          <button class="btn btn--ghost" type="button" id="cancelTask">
+            Anuluj
+          </button>
+          <button class="btn" type="submit">Zapisz</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
