@@ -6,6 +6,7 @@
     <title>Smart Study Planner</title>
     <link rel="stylesheet" href="./css/themes.css" />
     <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/escape.css" />
   </head>
 
   <body>
@@ -16,6 +17,13 @@
       </div>
 
       <div class="header-actions">
+        <div class="view-tabs">
+          <button id="tabPlanner" class="tab" type="button">Planer</button>
+          <button id="tabEscape" class="tab" type="button">
+            Gdzie bym był…
+          </button>
+        </div>
+
         <button
           id="themeToggle"
           class="btn btn--ghost"
@@ -28,7 +36,6 @@
     </header>
 
     <div class="layout">
-      <!-- SIDEBAR -->
       <aside class="sidebar">
         <h2 class="section-title">Przedmioty</h2>
 
@@ -53,115 +60,194 @@
         <ul id="subjectsList" class="subjects"></ul>
       </aside>
 
-      <!-- MAIN -->
       <main class="main">
-        <section class="topbar">
-          <div class="topbar__left">
-            <h1 id="currentSubjectTitle" class="page-title">
-              Wybierz przedmiot
-            </h1>
-            <p id="currentSubjectMeta" class="muted">
-              Dodaj przedmiot po lewej.
-            </p>
-          </div>
+        <section id="plannerView">
+          <section class="topbar">
+            <div class="topbar__left">
+              <h1 id="currentSubjectTitle" class="page-title">
+                Wybierz przedmiot
+              </h1>
+              <p id="currentSubjectMeta" class="muted">
+                Dodaj przedmiot po lewej.
+              </p>
+            </div>
 
-          <div class="topbar__right">
-            <select
-              id="filterSelect"
-              class="select"
-              aria-label="Filtruj zadania"
-            >
-              <option value="all">Wszystkie</option>
-              <option value="today">Dziś</option>
-              <option value="week">Do 7 dni</option>
-              <option value="overdue">Zaległe</option>
-              <option value="done">Zrobione</option>
-            </select>
+            <div class="topbar__right">
+              <select
+                id="filterSelect"
+                class="select"
+                aria-label="Filtruj zadania"
+              >
+                <option value="all">Wszystkie</option>
+                <option value="today">Dziś</option>
+                <option value="week">Do 7 dni</option>
+                <option value="overdue">Zaległe</option>
+                <option value="done">Zrobione</option>
+              </select>
 
-            <select id="sortSelect" class="select" aria-label="Sortuj zadania">
-              <option value="dueDateAsc">Termin ↑</option>
-              <option value="dueDateDesc">Termin ↓</option>
-              <option value="priorityDesc">Priorytet ↓</option>
-              <option value="createdDesc">Najnowsze</option>
-            </select>
+              <select
+                id="sortSelect"
+                class="select"
+                aria-label="Sortuj zadania"
+              >
+                <option value="dueDateAsc">Termin ↑</option>
+                <option value="dueDateDesc">Termin ↓</option>
+                <option value="priorityDesc">Priorytet ↓</option>
+                <option value="createdDesc">Najnowsze</option>
+              </select>
 
-            <button id="openTaskModal" class="btn" type="button" disabled>
-              + Zadanie
-            </button>
-          </div>
+              <button id="openTaskModal" class="btn" type="button" disabled>
+                + Zadanie
+              </button>
+            </div>
+          </section>
+
+          <section class="grid">
+            <div class="card">
+              <h2 class="card__title">Zadania</h2>
+              <ul id="tasksList" class="tasks"></ul>
+              <p id="emptyState" class="muted">Brak zadań. Dodaj pierwsze 🙂</p>
+            </div>
+
+            <div class="card">
+              <h2 class="card__title">Postęp</h2>
+              <div class="progress">
+                <div
+                  class="progress__bar"
+                  id="progressBar"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <p class="muted" id="progressText">0% (0/0)</p>
+            </div>
+
+            <div class="card">
+              <h2 class="card__title">Semestr</h2>
+
+              <p class="muted" style="margin-top: 0">
+                Do sesji: <strong id="sessionCountdown">—</strong>
+              </p>
+
+              <div class="progress" aria-label="Progres semestru">
+                <div
+                  class="progress__bar"
+                  id="semesterProgressBar"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <p class="muted" id="semesterProgressText">0%</p>
+
+              <div class="mini-grid" style="margin-top: 12px">
+                <div>
+                  <label class="label" for="semesterStart">Start</label>
+                  <input id="semesterStart" class="input" type="date" />
+                </div>
+                <div>
+                  <label class="label" for="semesterEnd">Koniec</label>
+                  <input id="semesterEnd" class="input" type="date" />
+                </div>
+                <div>
+                  <label class="label" for="sessionDate">Sesja</label>
+                  <input id="sessionDate" class="input" type="date" />
+                </div>
+              </div>
+              <p class="hint">Daty zapisują się automatycznie.</p>
+            </div>
+
+            <div class="card">
+              <h2 class="card__title">Motywacja</h2>
+              <quote-box></quote-box>
+            </div>
+
+            <div class="card">
+              <h2 class="card__title">Szybkie wskazówki</h2>
+              <ul class="tips">
+                <li>Dodaj terminy — filtr „Zaległe” pokaże co goni.</li>
+                <li>Używaj priorytetu „High” na kolokwia/projekty.</li>
+                <li>Włącz ciemny motyw wieczorem 👀</li>
+              </ul>
+            </div>
+          </section>
         </section>
 
-        <section class="grid">
-          <div class="card">
-            <h2 class="card__title">Zadania</h2>
-
-            <ul id="tasksList" class="tasks"></ul>
-            <p id="emptyState" class="muted">Brak zadań. Dodaj pierwsze 🙂</p>
-          </div>
-
-          <div class="card">
-            <h2 class="card__title">Postęp</h2>
-            <div class="progress">
-              <div
-                class="progress__bar"
-                id="progressBar"
-                style="width: 0%"
-              ></div>
+        <!--podstrona -->
+        <section id="escapeView" hidden>
+          <section class="escape-header">
+            <div>
+              <h1 class="page-title">Gdzie bym był, gdyby nie studia</h1>
             </div>
-            <p class="muted" id="progressText">0% (0/0)</p>
-          </div>
+            <div class="muted" id="escapeStatus"></div>
+          </section>
 
-          <div class="card">
-            <h2 class="card__title">Semestr</h2>
+          <div class="card" style="margin-bottom: var(--gap)">
+            <h2 class="card__title">Ustawienia</h2>
 
-            <p class="muted" style="margin-top: 0">
-              Do sesji: <strong id="sessionCountdown">—</strong>
+            <div class="escape-controls">
+              <div>
+                <label class="label" for="escapeRadius">Promień (km)</label>
+                <input
+                  id="escapeRadius"
+                  class="input"
+                  type="number"
+                  min="1"
+                  max="25"
+                  step="1"
+                />
+              </div>
+
+              <div>
+                <label class="label" for="escapeLimit">Limit wyników</label>
+                <input
+                  id="escapeLimit"
+                  class="input"
+                  type="number"
+                  min="5"
+                  max="50"
+                  step="5"
+                />
+              </div>
+
+              <div>
+                <label class="label" for="escapeSort">Sortowanie</label>
+                <select id="escapeSort" class="select">
+                  <option value="dist" selected>Najbliżej</option>
+                </select>
+              </div>
+
+              <div class="escape-actions">
+                <button id="escapeSearch" class="btn" type="button">
+                  Szukaj
+                </button>
+                <button id="escapeReset" class="btn btn--ghost" type="button">
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            <p class="hint">
+              Jeśli wyskoczy pytanie o lokalizację — kliknij „Zezwól”. Jak
+              odmówisz, policzy od UEK.
             </p>
-
-            <div class="progress" aria-label="Progres semestru">
-              <div
-                class="progress__bar"
-                id="semesterProgressBar"
-                style="width: 0%"
-              ></div>
-            </div>
-            <p class="muted" id="semesterProgressText">0%</p>
-
-            <div class="mini-grid" style="margin-top: 12px">
-              <div>
-                <label class="label" for="semesterStart">Start</label>
-                <input id="semesterStart" class="input" type="date" />
-              </div>
-              <div>
-                <label class="label" for="semesterEnd">Koniec</label>
-                <input id="semesterEnd" class="input" type="date" />
-              </div>
-              <div>
-                <label class="label" for="sessionDate">Sesja</label>
-                <input id="sessionDate" class="input" type="date" />
-              </div>
-            </div>
-            <p class="hint">Daty zapisują się automatycznie.</p>
           </div>
 
-          <div class="card">
-            <h2 class="card__title">Motywacja</h2>
-            <quote-box></quote-box>
-          </div>
+          <div class="escape-grid">
+            <div class="card">
+              <h2 class="card__title">Propozycje</h2>
+              <ul id="escapeList" class="place-list"></ul>
+              <p id="escapeEmpty" class="muted">
+                Kliknij „Szukaj”, żeby wczytać miejsca.
+              </p>
+            </div>
 
-          <div class="card">
-            <h2 class="card__title">Szybkie wskazówki</h2>
-            <ul class="tips">
-              <li>Dodaj terminy — filtr „Zaległe” pokaże co goni.</li>
-              <li>Używaj priorytetu „High” na kolokwia/projekty.</li>
-              <li>Włącz ciemny motyw wieczorem 👀</li>
-            </ul>
+            <div class="details" id="escapeDetails">
+              <h3>Szczegóły miejsca</h3>
+              <p class="muted">Wybierz coś z listy po lewej.</p>
+            </div>
           </div>
         </section>
       </main>
     </div>
 
-    <!-- MODAL: dodawanie zadania -->
     <dialog id="taskModal" class="modal">
       <form id="taskForm" class="modal__content" method="dialog">
         <div class="modal__header">

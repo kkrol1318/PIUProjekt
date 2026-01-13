@@ -6,15 +6,24 @@ import {
     addTask,
     toggleTaskDone,
     deleteTask,
-    setSemesterConfig,
+    setSemesterSettings,
 } from './store.js';
-import { priorityWeight } from './utils.js';
+
+import {
+    priorityWeight,
+    todayISO,
+    daysFromNowISO,
+    daysBetween,
+} from './utils.js';
+
 import './components/task-card.js';
 import './components/quote-box.js';
 
+import { initEscape } from './escape.js';
+
 const state = loadState();
 
-// ELEMENTY
+// elementy
 const themeToggle = document.getElementById('themeToggle');
 const subjectForm = document.getElementById('subjectForm');
 const subjectName = document.getElementById('subjectName');
@@ -42,36 +51,17 @@ const emptyState = document.getElementById('emptyState');
 const progressBar = document.getElementById('progressBar');
 const progressText = document.getElementById('progressText');
 
-// SEMESTER / SESSION
-const semesterStartInput = document.getElementById('semesterStart');
-const semesterEndInput = document.getElementById('semesterEnd');
-const sessionDateInput = document.getElementById('sessionDate');
 const sessionCountdown = document.getElementById('sessionCountdown');
 const semesterProgressBar = document.getElementById('semesterProgressBar');
 const semesterProgressText = document.getElementById('semesterProgressText');
 
-// THEME
+const semesterStart = document.getElementById('semesterStart');
+const semesterEnd = document.getElementById('semesterEnd');
+const sessionDate = document.getElementById('sessionDate');
+
 applyTheme(state.theme);
 
-// SEMESTER INPUTS init
-if (semesterStartInput) semesterStartInput.value = state.semesterStart;
-if (semesterEndInput) semesterEndInput.value = state.semesterEnd;
-if (sessionDateInput) sessionDateInput.value = state.sessionDate;
-
-function onSemesterInputChange() {
-    setSemesterConfig(state, {
-        semesterStart: semesterStartInput?.value,
-        semesterEnd: semesterEndInput?.value,
-        sessionDate: sessionDateInput?.value,
-    });
-    renderSemester();
-}
-
-semesterStartInput?.addEventListener('change', onSemesterInputChange);
-semesterEndInput?.addEventListener('change', onSemesterInputChange);
-sessionDateInput?.addEventListener('change', onSemesterInputChange);
-
-themeToggle.addEventListener('click', () => {
+themeToggle?.addEventListener('click', () => {
     const next =
         document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
     applyTheme(next);
@@ -80,14 +70,14 @@ themeToggle.addEventListener('click', () => {
 
 function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
-    themeToggle.setAttribute(
+    themeToggle?.setAttribute(
         'aria-pressed',
         theme === 'dark' ? 'true' : 'false'
     );
 }
 
-// SUBJECTS
-subjectForm.addEventListener('submit', (e) => {
+// subjects
+subjectForm?.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = subjectName.value.trim();
     if (!name) return;
@@ -96,20 +86,20 @@ subjectForm.addEventListener('submit', (e) => {
     render();
 });
 
-subjectsList.addEventListener('click', (e) => {
+subjectsList?.addEventListener('click', (e) => {
     const li = e.target.closest('li');
     if (!li) return;
     selectSubject(state, li.dataset.id);
     render();
 });
 
-// MODAL
-openTaskModal.addEventListener('click', () => taskModal.showModal());
-closeTaskModal.addEventListener('click', () => taskModal.close());
-cancelTask.addEventListener('click', () => taskModal.close());
+// modal
+openTaskModal?.addEventListener('click', () => taskModal.showModal());
+closeTaskModal?.addEventListener('click', () => taskModal.close());
+cancelTask?.addEventListener('click', () => taskModal.close());
 
-// TASKS
-taskForm.addEventListener('submit', (e) => {
+// taski
+taskForm?.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!state.selectedSubjectId) return;
 
@@ -130,22 +120,52 @@ taskForm.addEventListener('submit', (e) => {
     render({ animateNewTaskId: task.id });
 });
 
-// Zdarzenia  Componentów
-tasksList.addEventListener('toggleDone', (e) => {
+// Zdarzenia z Web Componentów
+tasksList?.addEventListener('toggleDone', (e) => {
     toggleTaskDone(state, e.detail.id);
     render();
 });
 
-tasksList.addEventListener('delete', (e) => {
+tasksList?.addEventListener('delete', (e) => {
     deleteTask(state, e.detail.id);
     render();
 });
 
-// FILTER/SORT
-filterSelect.addEventListener('change', () => render());
-sortSelect.addEventListener('change', () => render());
+// filter/sort
+filterSelect?.addEventListener('change', () => render());
+sortSelect?.addEventListener('change', () => render());
 
-// RENDER
+// semestr sett
+function wireSemesterInputs() {
+    if (!semesterStart || !semesterEnd || !sessionDate) return;
+
+    // wczytaj z state do inputów
+    if (state.semester?.start) semesterStart.value = state.semester.start;
+    if (state.semester?.end) semesterEnd.value = state.semester.end;
+    if (state.semester?.sessionDate)
+        sessionDate.value = state.semester.sessionDate;
+
+    const onChange = () => {
+        setSemesterSettings(state, {
+            start: semesterStart.value || null,
+            end: semesterEnd.value || null,
+            sessionDate: sessionDate.value || null,
+        });
+        renderSemester();
+    };
+
+    semesterStart.addEventListener('change', onChange);
+    semesterEnd.addEventListener('change', onChange);
+    sessionDate.addEventListener('change', onChange);
+}
+
+wireSemesterInputs();
+
+try {
+    initEscape?.(state);
+} catch {}
+
+// render
 render();
 
 function render({ animateNewTaskId = null } = {}) {
@@ -157,6 +177,7 @@ function render({ animateNewTaskId = null } = {}) {
 }
 
 function renderSubjects() {
+    if (!subjectsList) return;
     subjectsList.innerHTML = '';
 
     for (const s of state.subjects) {
@@ -171,6 +192,8 @@ function renderSubjects() {
 }
 
 function renderHeader() {
+    if (!currentSubjectTitle || !currentSubjectMeta || !openTaskModal) return;
+
     const subject = state.subjects.find(
         (s) => s.id === state.selectedSubjectId
     );
@@ -194,29 +217,25 @@ function getVisibleTasks() {
 
     let list = state.tasks.filter((t) => t.subjectId === subjectId);
 
-    // filtr
-    const today = new Date();
-    const todayISO = today.toISOString().slice(0, 10);
-    const in7 = new Date();
-    in7.setDate(in7.getDate() + 7);
-    const in7ISO = in7.toISOString().slice(0, 10);
+    const today = todayISO();
+    const in7 = daysFromNowISO(7);
 
-    switch (filterSelect.value) {
+    switch (filterSelect?.value) {
         case 'today':
-            list = list.filter((t) => t.dueDate === todayISO && !t.done);
+            list = list.filter((t) => t.dueDate === today && !t.done);
             break;
         case 'week':
             list = list.filter(
                 (t) =>
                     t.dueDate &&
-                    t.dueDate >= todayISO &&
-                    t.dueDate <= in7ISO &&
+                    t.dueDate >= today &&
+                    t.dueDate <= in7 &&
                     !t.done
             );
             break;
         case 'overdue':
             list = list.filter(
-                (t) => t.dueDate && t.dueDate < todayISO && !t.done
+                (t) => t.dueDate && t.dueDate < today && !t.done
             );
             break;
         case 'done':
@@ -226,8 +245,7 @@ function getVisibleTasks() {
             break;
     }
 
-    // sort
-    const sort = sortSelect.value;
+    const sort = sortSelect?.value ?? 'dueDateAsc';
     list = [...list].sort((a, b) => {
         if (sort === 'dueDateAsc')
             return (a.dueDate ?? '9999-99-99').localeCompare(
@@ -247,6 +265,8 @@ function getVisibleTasks() {
 }
 
 function renderTasks(animateNewTaskId) {
+    if (!tasksList || !emptyState) return;
+
     const list = getVisibleTasks();
     tasksList.innerHTML = '';
 
@@ -276,6 +296,8 @@ function renderTasks(animateNewTaskId) {
 }
 
 function renderProgress() {
+    if (!progressBar || !progressText) return;
+
     const subjectId = state.selectedSubjectId;
     if (!subjectId) {
         progressBar.style.width = '0%';
@@ -292,49 +314,33 @@ function renderProgress() {
     progressText.textContent = `${pct}% (${done}/${total})`;
 }
 
-function clampPct(n) {
-    return Math.max(0, Math.min(100, n));
-}
-
-function daysBetweenISO(fromISO, toISO) {
-    const from = new Date(fromISO + 'T00:00:00');
-    const to = new Date(toISO + 'T00:00:00');
-    const diff = to.getTime() - from.getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
-
 function renderSemester() {
-    // countdown do sesji
-    const today = new Date();
-    const todayISO = today.toISOString().slice(0, 10);
+    if (!sessionCountdown || !semesterProgressBar || !semesterProgressText)
+        return;
 
-    if (!state.sessionDate) {
+    const today = todayISO();
+    const { start, end, sessionDate } = state.semester ?? {};
+
+    // dni do sesji
+    if (!sessionDate) {
         sessionCountdown.textContent = '—';
     } else {
-        const d = daysBetweenISO(todayISO, state.sessionDate);
-        if (d > 1) sessionCountdown.textContent = `${d} dni`;
-        else if (d === 1) sessionCountdown.textContent = '1 dzień';
-        else if (d === 0) sessionCountdown.textContent = 'dzisiaj';
-        else sessionCountdown.textContent = `${Math.abs(d)} dni po sesji`;
+        const d = daysBetween(today, sessionDate);
+        sessionCountdown.textContent =
+            d >= 0 ? `${d} dni` : `minęło ${Math.abs(d)} dni`;
     }
 
     // progres semestru
-    const start = state.semesterStart;
-    const end = state.semesterEnd;
-
-    if (!start || !end || end < start) {
+    if (!start || !end) {
         semesterProgressBar.style.width = '0%';
         semesterProgressText.textContent = '0%';
         return;
     }
 
-    const totalDays = Math.max(1, daysBetweenISO(start, end));
-    const elapsedDays = totalDays - Math.max(0, daysBetweenISO(todayISO, end));
-    const pct = clampPct(Math.round((elapsedDays / totalDays) * 100));
+    const total = Math.max(1, daysBetween(start, end));
+    const passed = daysBetween(start, today);
+    const pct = Math.max(0, Math.min(100, Math.round((passed / total) * 100)));
 
     semesterProgressBar.style.width = `${pct}%`;
-    semesterProgressText.textContent = `${pct}% (${Math.min(
-        Math.max(elapsedDays, 0),
-        totalDays
-    )}/${totalDays} dni)`;
+    semesterProgressText.textContent = `${pct}%`;
 }

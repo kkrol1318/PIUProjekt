@@ -1,0 +1,3 @@
+navigator.permissions
+  .query({ name: "geolocation" })
+  .then(r => console.log(r.state));  - komenda do sprawdzenia permisji odnośnie lokalizacji w devtools

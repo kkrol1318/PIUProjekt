@@ -1,42 +1,48 @@
 const STORAGE_KEY = 'smart-study-planner:v1';
 
-function pad2(n) {
-    return String(n).padStart(2, '0');
-}
-
-function toISODate(d) {
-    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-}
-
-function defaultSemesterConfig() {
-    const now = new Date();
-    const startYear =
-        now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
-    const start = new Date(startYear, 9, 1); // 1 października
-    const session = new Date(startYear + 1, 0, 20); // 20 stycznia
-    const end = new Date(startYear + 1, 1, 15); // 15 lutego
-
-    return {
-        semesterStart: toISODate(start),
-        semesterEnd: toISODate(end),
-        sessionDate: toISODate(session),
-    };
-}
-
 const defaultState = {
     theme: 'light',
     selectedSubjectId: null,
     subjects: [],
     tasks: [],
-    ...defaultSemesterConfig(),
+    view: 'planner',
+
+    semester: {
+        start: null,
+        end: null,
+        sessionDate: null,
+    },
+
+    escape: {
+        // punkt odniesienia (fallback) ustawiony narazie na uek, żeby nie brało ogólnej lokalizacji krakowa, zmienić/nie zmienić
+        lat: 50.0669,
+        lon: 19.9556,
+
+        radiusKm: 5,
+        limit: 20,
+        sort: 'dist',
+        selectedXid: null,
+    },
 };
+
+function deepMerge(base, patch) {
+    const out = { ...base };
+    for (const [k, v] of Object.entries(patch || {})) {
+        if (v && typeof v === 'object' && !Array.isArray(v)) {
+            out[k] = deepMerge(base[k] ?? {}, v);
+        } else {
+            out[k] = v;
+        }
+    }
+    return out;
+}
 
 export function loadState() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return structuredClone(defaultState);
         const parsed = JSON.parse(raw);
-        return { ...structuredClone(defaultState), ...parsed };
+        return deepMerge(structuredClone(defaultState), parsed);
     } catch {
         return structuredClone(defaultState);
     }
@@ -48,6 +54,11 @@ export function saveState(state) {
 
 export function setTheme(state, theme) {
     state.theme = theme;
+    saveState(state);
+}
+
+export function setView(state, view) {
+    state.view = view;
     saveState(state);
 }
 
@@ -81,9 +92,12 @@ export function deleteTask(state, taskId) {
     saveState(state);
 }
 
-export function setSemesterConfig(state, patch) {
-    state.semesterStart = patch.semesterStart ?? state.semesterStart;
-    state.semesterEnd = patch.semesterEnd ?? state.semesterEnd;
-    state.sessionDate = patch.sessionDate ?? state.sessionDate;
+export function setSemesterSettings(state, patch) {
+    state.semester = { ...state.semester, ...patch };
+    saveState(state);
+}
+
+export function setEscapeSettings(state, patch) {
+    state.escape = { ...state.escape, ...patch };
     saveState(state);
 }

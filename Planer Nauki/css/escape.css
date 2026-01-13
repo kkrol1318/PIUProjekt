@@ -1,0 +1,143 @@
+/* "Gdzie bym był, zadał to pytanie zasmucony student podczas sesji" */
+
+.view-tabs {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.tab {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 140ms ease, opacity 140ms ease, border-color 140ms ease;
+  white-space: nowrap;
+}
+.tab:hover {
+  transform: translateY(-1px);
+}
+.tab--active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.escape-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: var(--gap);
+}
+
+.escape-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.escape-actions {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.escape-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--gap);
+}
+
+.place-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.place-item {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 140ms ease, border-color 140ms ease;
+}
+.place-item:hover {
+  transform: translateY(-1px);
+  border-color: var(--primary);
+}
+
+.place-name {
+  margin: 0;
+  font-weight: 700;
+}
+.place-meta {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.badge {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  height: fit-content;
+}
+
+.details {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--gap);
+  box-shadow: var(--shadow);
+}
+
+.details h3 {
+  margin: 0 0 10px;
+}
+.details p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+.details a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.details a:hover {
+  text-decoration: underline;
+}
+.details img {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  margin-top: 10px;
+}
+
+@media (max-width: 1024px) {
+  .escape-controls {
+    grid-template-columns: 1fr;
+  }
+  .escape-actions {
+    align-items: stretch;
+  }
+  .escape-grid {
+    grid-template-columns: 1fr;
+  }
+  .escape-header {
+    flex-direction: column;
+  }
+}

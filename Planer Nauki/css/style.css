@@ -285,7 +285,7 @@ body {
   }
 }
 
-/*  UI dla ustawień semestru */
+/* do semestru */
 .mini-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
