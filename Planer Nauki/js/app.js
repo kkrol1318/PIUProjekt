@@ -24,6 +24,8 @@ import { initEscape } from './escape.js';
 
 import { renderGallery } from './gallery.js';
 
+import { initFeedback } from './feedback.js';
+
 const state = loadState();
 
 // elementy
@@ -67,6 +69,9 @@ const plannerView = document.getElementById('plannerView');
 const escapeView = document.getElementById('escapeView');
 const galleryView = document.getElementById('galleryView');
 
+const tabFeedback = document.getElementById('tabFeedback');
+const feedbackView = document.getElementById('feedbackView');
+
 applyTheme(state.theme);
 
 themeToggle?.addEventListener('click', () => {
@@ -92,9 +97,11 @@ function showOnlyGallery() {
     if (plannerView) plannerView.hidden = true;
     if (escapeView) escapeView.hidden = true;
     if (galleryView) galleryView.hidden = false;
+    if (feedbackView) feedbackView.hidden = true;
 
     document.getElementById('tabPlanner')?.classList.remove('tab--active');
     document.getElementById('tabEscape')?.classList.remove('tab--active');
+    tabFeedback?.classList.remove('tab--active');
 
     tabGallery?.classList.add('tab--active');
 }
@@ -102,6 +109,24 @@ function showOnlyGallery() {
 function hideGallery() {
     if (galleryView) galleryView.hidden = true;
     tabGallery?.classList.remove('tab--active');
+}
+
+function showFeedback() {
+    if (plannerView) plannerView.hidden = true;
+    if (escapeView) escapeView.hidden = true;
+    if (galleryView) galleryView.hidden = true;
+    if (feedbackView) feedbackView.hidden = false;
+
+    document.getElementById('tabPlanner')?.classList.remove('tab--active');
+    document.getElementById('tabEscape')?.classList.remove('tab--active');
+    tabGallery?.classList.remove('tab--active');
+
+    tabFeedback?.classList.add('tab--active');
+}
+
+function hideFeedback() {
+    if (feedbackView) feedbackView.hidden = true;
+    tabFeedback?.classList.remove('tab--active');
 }
 
 tabGallery?.addEventListener('click', () => {
@@ -120,11 +145,27 @@ tabGallery?.addEventListener('click', () => {
     if (galleryReady()) renderGallery();
 });
 
+tabFeedback?.addEventListener('click', () => {
+    if (state.view === 'feedback') {
+        setView(state, 'planner');
+        hideFeedback();
+
+        if (plannerView) plannerView.hidden = false;
+        if (escapeView) escapeView.hidden = true;
+        return;
+    }
+
+    setView(state, 'feedback');
+    showFeedback();
+});
+
 document.getElementById('tabPlanner')?.addEventListener('click', () => {
     if (state.view === 'gallery') hideGallery();
+    if (state.view === 'feedback') hideFeedback();
 });
 document.getElementById('tabEscape')?.addEventListener('click', () => {
     if (state.view === 'gallery') hideGallery();
+    if (state.view === 'feedback') hideFeedback();
 });
 
 // subjects
@@ -216,11 +257,19 @@ try {
     initEscape?.(state);
 } catch {}
 
+try {
+    initFeedback?.();
+} catch {}
+
 if (state.view === 'gallery' && galleryReady()) {
     showOnlyGallery();
     renderGallery();
 } else if (state.view === 'gallery' && !galleryReady()) {
     setView(state, 'planner');
+}
+
+if (state.view === 'feedback') {
+    showFeedback();
 }
 
 // render

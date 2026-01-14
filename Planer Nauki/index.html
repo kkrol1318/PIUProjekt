@@ -24,6 +24,7 @@
             Gdzie bym był…
           </button>
           <button id="tabGallery" class="tab" type="button">Galeria</button>
+          <button id="tabFeedback" class="tab" type="button">Kontakt</button>
         </div>
 
         <button
@@ -275,6 +276,144 @@
           </section>
 
           <div class="gallery-grid" id="galleryGrid"></div>
+        </section>
+
+        <!--feedback -->
+        <section id="feedbackView" hidden>
+          <section class="topbar">
+            <div class="topbar__left">
+              <h1 class="page-title">Kontakt</h1>
+            </div>
+          </section>
+
+          <div class="grid">
+            <div class="card">
+              <h2 class="card__title">Formularz</h2>
+
+              <form id="feedbackForm" class="form" novalidate>
+                <label class="label" for="fbEmail">Email</label>
+                <input
+                  id="fbEmail"
+                  class="input"
+                  type="email"
+                  required
+                  placeholder="np. anna@example.com"
+                />
+
+                <label class="label" for="fbTel">Telefon</label>
+                <input
+                  id="fbTel"
+                  class="input"
+                  type="tel"
+                  required
+                  pattern="\+?[0-9 ]{9,15}"
+                  placeholder="np. +48 123 456 789"
+                />
+
+                <label class="label" for="fbTopic">Temat</label>
+                <input
+                  id="fbTopic"
+                  class="input"
+                  list="fbTopics"
+                  required
+                  placeholder="Wybierz lub wpisz własny"
+                />
+                <datalist id="fbTopics">
+                  <option value="Błąd w aplikacji"></option>
+                  <option value="Propozycja funkcji"></option>
+                  <option value="Pytanie"></option>
+                  <option value="Inne"></option>
+                </datalist>
+
+                <div class="row row--3" style="margin-top: 10px">
+                  <div>
+                    <label class="label" for="fbType">Rodzaj zgłoszenia</label>
+                    <select id="fbType" class="select" required>
+                      <option value="bug">Bug</option>
+                      <option value="idea">Pomysł</option>
+                      <option value="question">Pytanie</option>
+                      <option value="other">Inne</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="label" for="fbRating">
+                      Ocena (1–10): <span id="fbRatingValue">7</span>
+                    </label>
+                    <input
+                      id="fbRating"
+                      class="input"
+                      type="range"
+                      min="1"
+                      max="10"
+                      value="7"
+                    />
+                  </div>
+
+                  <div>
+                    <label class="label" for="fbContact"
+                      >Preferowany kontakt</label
+                    >
+                    <select id="fbContact" class="select" required>
+                      <option value="email">Email</option>
+                      <option value="tel">Telefon</option>
+                    </select>
+                  </div>
+                </div>
+
+                <label class="label" for="fbMessage">Wiadomość</label>
+                <textarea
+                  id="fbMessage"
+                  class="input"
+                  required
+                  minlength="10"
+                  maxlength="500"
+                  rows="6"
+                  placeholder="Napisz wiadomość (min. 10 znaków)"
+                  style="resize: vertical"
+                ></textarea>
+
+                <label class="row" style="margin-top: 12px">
+                  <input id="fbConsent" type="checkbox" required />
+                  <span class="muted">
+                    Zgadzam się na kontakt zwrotny w sprawie zgłoszenia.
+                  </span>
+                </label>
+
+                <div class="modal__actions" style="margin-top: 14px">
+                  <button id="fbSubmit" class="btn" type="submit">
+                    Wyślij
+                  </button>
+                  <button id="fbReset" class="btn btn--ghost" type="reset">
+                    Wyczyść
+                  </button>
+                </div>
+
+                <p class="hint" style="margin-top: 10px">
+                  Walidacja jest natywna (HTML5). Jeśli pole jest błędne,
+                  przeglądarka pokaże komunikat.
+                </p>
+              </form>
+            </div>
+
+            <div class="card">
+              <h2 class="card__title">Wynik wysyłki</h2>
+              <p class="muted" id="fbStatus">—</p>
+              <pre
+                id="fbResult"
+                style="
+                  margin: 10px 0 0;
+                  padding: 12px;
+                  border-radius: 14px;
+                  border: 1px solid var(--border);
+                  background: var(--surface);
+                  overflow: auto;
+                  max-height: 320px;
+                  white-space: pre-wrap;
+                "
+              ></pre>
+            </div>
+          </div>
         </section>
       </main>
     </div>
