@@ -402,3 +402,70 @@ function renderSemester() {
     semesterProgressBar.style.width = `${pct}%`;
     semesterProgressText.textContent = `${pct}%`;
 }
+
+/*MOTYWACJA DNIA (picture + source)*/
+const DAILY_KEY = 'daily-motivation-image-v1';
+
+const DAILY_IMAGES = [
+    { id: 1, caption: 'Małe kroki codziennie robią wielką różnicę.' },
+    { id: 2, caption: 'Najtrudniejszy jest start — potem już leci.' },
+    { id: 3, caption: 'Zrób dziś coś, za co jutro sobie podziękujesz.' },
+    { id: 4, caption: 'Konsekwencja > motywacja.' },
+    { id: 5, caption: 'Dyscyplina to forma troski o siebie.' },
+    { id: 6, caption: 'Nie czekaj na idealny moment.' },
+    { id: 7, caption: 'Skup się na procesie, nie tylko na celu.' },
+    { id: 8, caption: 'Zrobione jest lepsze niż idealne.' },
+    { id: 9, caption: 'Każdy dzień to nowa szansa.' },
+    { id: 10, caption: 'Powtarzaj, aż stanie się łatwe.' },
+];
+
+function todayKey() {
+    return new Date().toISOString().slice(0, 10);
+}
+
+function getDailyImage() {
+    try {
+        const raw = localStorage.getItem(DAILY_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed.date === todayKey()) return parsed;
+        }
+    } catch {}
+
+    const random =
+        DAILY_IMAGES[Math.floor(Math.random() * DAILY_IMAGES.length)];
+
+    const data = {
+        date: todayKey(),
+        id: random.id,
+        caption: random.caption,
+    };
+
+    try {
+        localStorage.setItem(DAILY_KEY, JSON.stringify(data));
+    } catch {}
+
+    return data;
+}
+
+function initDailyMotivation() {
+    const pic = document.getElementById('dailyPicture');
+    if (!pic) return;
+
+    const small = document.getElementById('dailySourceSmall');
+    const large = document.getElementById('dailySourceLarge');
+    const img = document.getElementById('dailyImage');
+    const cap = document.getElementById('dailyCaption');
+
+    const daily = getDailyImage();
+
+    const id = daily.id;
+
+    small.srcset = `./assets/gallery/${id}-480.jpg`;
+    large.srcset = `./assets/gallery/${id}-1200.jpg`;
+    img.src = `./assets/gallery/${id}-1200.jpg`;
+    img.alt = daily.caption;
+    cap.textContent = daily.caption;
+}
+
+initDailyMotivation();

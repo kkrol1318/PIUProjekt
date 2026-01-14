@@ -169,6 +169,24 @@
                 <li>Włącz ciemny motyw wieczorem 👀</li>
               </ul>
             </div>
+
+            <div class="card">
+              <h2 class="card__title">Motywacja dnia</h2>
+
+              <picture id="dailyPicture">
+                <source id="dailySourceSmall" media="(max-width: 768px)" />
+                <source id="dailySourceLarge" media="(min-width: 769px)" />
+                <img
+                  id="dailyImage"
+                  alt="Motywacja dnia"
+                  loading="lazy"
+                  decoding="async"
+                  class="daily-photo"
+                />
+              </picture>
+
+              <p class="muted" id="dailyCaption" style="margin-top: 10px"></p>
+            </div>
           </section>
         </section>
 
