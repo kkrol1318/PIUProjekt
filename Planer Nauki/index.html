@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/themes.css" />
     <link rel="stylesheet" href="./css/style.css" />
     <link rel="stylesheet" href="./css/escape.css" />
+    <link rel="stylesheet" href="./css/gallery.css" />
   </head>
 
   <body>
@@ -22,6 +23,7 @@
           <button id="tabEscape" class="tab" type="button">
             Gdzie bym był…
           </button>
+          <button id="tabGallery" class="tab" type="button">Galeria</button>
         </div>
 
         <button
@@ -244,6 +246,17 @@
               <p class="muted">Wybierz coś z listy po lewej.</p>
             </div>
           </div>
+        </section>
+
+        <!--galeria -->
+        <section id="galleryView" hidden>
+          <section class="gallery-header">
+            <div>
+              <h1 class="page-title">Galeria motywacyjna</h1>
+            </div>
+          </section>
+
+          <div class="gallery-grid" id="galleryGrid"></div>
         </section>
       </main>
     </div>

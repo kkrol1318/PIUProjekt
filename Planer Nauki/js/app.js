@@ -7,6 +7,7 @@ import {
     toggleTaskDone,
     deleteTask,
     setSemesterSettings,
+    setView,
 } from './store.js';
 
 import {
@@ -20,6 +21,8 @@ import './components/task-card.js';
 import './components/quote-box.js';
 
 import { initEscape } from './escape.js';
+
+import { renderGallery } from './gallery.js';
 
 const state = loadState();
 
@@ -59,6 +62,11 @@ const semesterStart = document.getElementById('semesterStart');
 const semesterEnd = document.getElementById('semesterEnd');
 const sessionDate = document.getElementById('sessionDate');
 
+const tabGallery = document.getElementById('tabGallery');
+const plannerView = document.getElementById('plannerView');
+const escapeView = document.getElementById('escapeView');
+const galleryView = document.getElementById('galleryView');
+
 applyTheme(state.theme);
 
 themeToggle?.addEventListener('click', () => {
@@ -75,6 +83,49 @@ function applyTheme(theme) {
         theme === 'dark' ? 'true' : 'false'
     );
 }
+
+function galleryReady() {
+    return Boolean(galleryView && document.getElementById('galleryGrid'));
+}
+
+function showOnlyGallery() {
+    if (plannerView) plannerView.hidden = true;
+    if (escapeView) escapeView.hidden = true;
+    if (galleryView) galleryView.hidden = false;
+
+    document.getElementById('tabPlanner')?.classList.remove('tab--active');
+    document.getElementById('tabEscape')?.classList.remove('tab--active');
+
+    tabGallery?.classList.add('tab--active');
+}
+
+function hideGallery() {
+    if (galleryView) galleryView.hidden = true;
+    tabGallery?.classList.remove('tab--active');
+}
+
+tabGallery?.addEventListener('click', () => {
+    if (state.view === 'gallery') {
+        setView(state, 'planner');
+        hideGallery();
+
+        if (plannerView) plannerView.hidden = false;
+        if (escapeView) escapeView.hidden = true;
+        return;
+    }
+
+    setView(state, 'gallery');
+    showOnlyGallery();
+
+    if (galleryReady()) renderGallery();
+});
+
+document.getElementById('tabPlanner')?.addEventListener('click', () => {
+    if (state.view === 'gallery') hideGallery();
+});
+document.getElementById('tabEscape')?.addEventListener('click', () => {
+    if (state.view === 'gallery') hideGallery();
+});
 
 // subjects
 subjectForm?.addEventListener('submit', (e) => {
@@ -164,6 +215,13 @@ wireSemesterInputs();
 try {
     initEscape?.(state);
 } catch {}
+
+if (state.view === 'gallery' && galleryReady()) {
+    showOnlyGallery();
+    renderGallery();
+} else if (state.view === 'gallery' && !galleryReady()) {
+    setView(state, 'planner');
+}
 
 // render
 render();
